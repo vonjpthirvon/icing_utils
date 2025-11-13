@@ -1,0 +1,10 @@
+chardet
+matplotlib
+numpy
+pandas
+plotly
+python_dateutil
+requests
+streamlit
+cmocean
+folium
