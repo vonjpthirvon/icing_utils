@@ -241,3 +241,9 @@ def plot_icegraph(
     plt.tight_layout(rect=[0, 0, 1, 0.98])
 
     return fig
+
+def plot_parameter(df: pd.DataFrame, parameter: str, start_datetime: datetime, end_datetime:datetime) -> go.Figure:
+    fig = px.line(df, x=df.index, y=parameter, \
+        title=f'{df["stationname"].iloc[0]} {start_datetime.date()} - {end_datetime.date()}'        
+        )
+    return fig
