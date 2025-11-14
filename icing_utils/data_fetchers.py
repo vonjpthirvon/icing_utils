@@ -180,7 +180,7 @@ def calculate_icing(df: pd.DataFrame) -> pd.DataFrame:
     df["cumul_mm_filtered"] = df["cumul_mm_filtered"].ffill()
 
     # Calculate the cumulative sum
-    df[f"cumul_mm_fzmm"] = df[f"fzmm"].cumsum()
+    df[f"cumul_mm_fzmm"] = (df[f"fzmm"] / 60.0).cumsum()
     # Poistetaan NaN arvot
     df["cumul_mm_fzmm"] = df["cumul_mm_fzmm"].ffill()   
     
