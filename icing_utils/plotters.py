@@ -176,11 +176,13 @@ def plot_icegraph(
     ax4.plot(df.index, df["NFC"], label="NFC", linestyle='--', color='red')
     ax5.plot(df.index, df["NFC_filtered"], label="NFC_filtered", linestyle=':', color='red')
 
-    ax3.plot(df.index, df["mm_instant"], label="mm inst", linestyle='--', color='blue')
-    ax3.plot(df.index, df["mm_instant_filtered"], label="mm instant filtered", linestyle=':', color='red')
+    ax3.plot(df.index, df["mm_instant"], label="mm inst", linestyle='-.', color='green')
+    ax3.plot(df.index, df["mm_instant_filtered"], label="mm instant filtered", linestyle='--', color='red')
+    ax3.plot(df.index, df["mm_fzmm"], label="fzmm inst", linestyle=':', color='blue')
 
-    ax1.plot(df.index, df["cumul_mm_filtered"], label="cumul mm filtered", linestyle='--', color='red')
     ax1.plot(df.index, df["cumul_mm"], label="cumul mm", linestyle='-.', color='green')
+    ax1.plot(df.index, df["cumul_mm_filtered"], label="cumul mm filtered", linestyle='--', color='red')
+    ax1.plot(df.index, df["cumul_mm_fzmm"], label="cumul fzmm", linestyle=':', color='blue')
 
     axes = [ax1, ax2, ax3, ax4, ax5]
     for ax in axes:
