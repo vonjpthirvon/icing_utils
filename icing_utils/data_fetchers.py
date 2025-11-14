@@ -208,10 +208,10 @@ def fetch_icedata(
     # MSOF frequensy main sensor oscillator.
     if sensor_id is not None:
         fzfreq_string = f"fzfreq_pt1m_instant(:{sensor_id}) as fzfreq"
-        fzmm_string = f"fzmm_pt1m_instant(:{sensor_id}) as fzmm"
+        fzmm_string = f"fzmm_pt1h_acc(:{sensor_id}) as fzmm"
     else:
         fzfreq_string = f"fzfreq_pt1m_instant as fzfreq"
-        fzmm_string = f"fzmm_pt1m_instant as fzmm"
+        fzmm_string = f"fzmm_pt1h_acc as fzmm"
 
     # definitions for data download
     payload = {
