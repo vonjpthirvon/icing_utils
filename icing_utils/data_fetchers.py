@@ -39,7 +39,7 @@ def calculate_icing(df: pd.DataFrame) -> pd.DataFrame:
     # ESIM. ajanhetkelle klo 13:28 liukuva minimi määritellään arvoista 13:12-13:27, pythonissa shift(1) tekee tämän.
     # column nimi viittaa 15 minuuttiin, mutta todellisudessa 10 minuuttia.
 
-    df['moving_minimun_15minutes'] = df['fzfreq'].shift(1).rolling(pd.Timedelta('15min1s')).min()
+    df['moving_minimun_15minutes'] = df['fzfreq'].shift(1).rolling(pd.Timedelta('10min1s')).min()
     # df['moving_minimun_15minutes'] = df['fzfreq'].shift(freq='30s').rolling(pd.Timedelta('10min1s')).min()
 
     # Lasketaan net frequency change, eli taajuuden muutos eri ajanhetkinä
