@@ -39,7 +39,7 @@ def calculate_icing(df: pd.DataFrame) -> pd.DataFrame:
     # ESIM. ajanhetkelle klo 13:28 liukuva minimi määritellään arvoista 13:12-13:27, pythonissa shift(1) tekee tämän.
     # column nimi viittaa 15 minuuttiin, mutta todellisudessa 10 minuuttia.
 
-    df['moving_minimun_15minutes'] = df['fzfreq'].shift(1).rolling(pd.Timedelta('15min1s')).min()
+    df['moving_minimun_15minutes'] = df['fzfreq'].shift(1).rolling(pd.Timedelta('10min1s')).min()
     # df['moving_minimun_15minutes'] = df['fzfreq'].shift(freq='30s').rolling(pd.Timedelta('10min1s')).min()
 
     # Lasketaan net frequency change, eli taajuuden muutos eri ajanhetkinä
@@ -85,13 +85,14 @@ def calculate_icing(df: pd.DataFrame) -> pd.DataFrame:
 
     # Calculate the cumulative sum
     df[f"cumul_mm_orig"] = df[f"mm_orig"].cumsum()
+    df[f"mm_orig"] = df[f"mm_orig"] * 60.0 # mm/h:ksi
 
     # instant luvuet
     df[f"mm_mean_10min"] = df[f"NFC_mean_10min"] * 0.00381
 
     # Calculate the cumulative sum
     df[f"cumul_mm_mean_10min"] = df[f"mm_mean_10min"].cumsum()
-
+    df[f"mm_mean_10min"] = df[f"mm_mean_10min"] * 60.0 # mm/h:ksi
     # instant luvuet
     df[f"mm_instant"] = df[f"NFC"] * 0.00381
     
@@ -134,6 +135,7 @@ def calculate_icing(df: pd.DataFrame) -> pd.DataFrame:
 
     # Calculate the cumulative sum
     df[f"cumul_mm"] = df[f"mm_instant"].cumsum()
+    df[f"mm_instant"] = df[f"mm_instant"] * 60.0
     # Poistetaan NaN arvot
     df["cumul_mm"] = df["cumul_mm"].ffill()
 
@@ -171,9 +173,16 @@ def calculate_icing(df: pd.DataFrame) -> pd.DataFrame:
             # print(f"{mittausaika}")
 
     # Calculate the cumulative sum
-    df[f"cumul_mm_filtered"] = df[f"mm_instant_filtered"].cumsum()
+    # df[f"cumul_mm_filtered"] = df[f"cumul_mm_filtered"] * 60.0 # muunnetaan mm/h
+    df[f"cumul_mm_filtered"] = df[f"mm_instant_filtered"].cumsum() # Ensin lasketaan kertymäsumma ja sitten
+    df[f"mm_instant_filtered"] = df[f"mm_instant_filtered"] * 60.0 # muunnetaan mm/h
     # Poistetaan NaN arvot
-    df["cumul_mm_filtered"] = df["cumul_mm_filtered"].ffill()   
+    df["cumul_mm_filtered"] = df["cumul_mm_filtered"].ffill()
+
+    # Calculate the cumulative sum
+    df[f"cumul_mm_fzmm"] = (df[f"fzmm"] / 60.0).cumsum()
+    # Poistetaan NaN arvot
+    df["cumul_mm_fzmm"] = df["cumul_mm_fzmm"].ffill()   
     
     return df
 
@@ -199,8 +208,10 @@ def fetch_icedata(
     # MSOF frequensy main sensor oscillator.
     if sensor_id is not None:
         fzfreq_string = f"fzfreq_pt1m_instant(:{sensor_id}) as fzfreq"
+        fzmm_string = f"fzmm_pt1h_acc(:{sensor_id}) as fzmm"
     else:
         fzfreq_string = f"fzfreq_pt1m_instant as fzfreq"
+        fzmm_string = f"fzmm_pt1h_acc as fzmm"
 
     # definitions for data download
     payload = {
@@ -216,7 +227,7 @@ def fetch_icedata(
         "fmisid": f"{FMISID}",
         "param": (
             "fmisid,stationname,name,utctime,localtime,lat,lon,"
-            f"{fzfreq_string}"
+            f"{fzfreq_string},{fzmm_string}"
         )
     }
 
@@ -238,7 +249,7 @@ def fetch_icedata(
         result = chardet.detect(raw_data)
         encoding = result['encoding']
         df = pd.read_csv(StringIO(raw_data.decode(encoding)))
-        # print(df.head())
+        print(df.head())
     else:
         print(f"Download failed with statuscode: {response.status_code}")
         return pd.DataFrame()
@@ -246,6 +257,7 @@ def fetch_icedata(
     # If there is more than one sensor in a site convert column name to ordinary.
     if f"fzfreq_#{sensor_id}" in df.columns:
         df = df.rename(columns={f"fzfreq_#{sensor_id}": "fzfreq"})
+        df = df.rename(columns={f"fzmm_#{sensor_id}": "fzmm"})
 
     # Convert "utctime"-column as datetime-format
     df["utctime"] = pd.to_datetime(df["utctime"], format="%Y-%m-%d %H:%M:%S")
