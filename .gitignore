@@ -9,6 +9,9 @@ __pycache__/
 # Doccer istuntotila
 *.devcontainer/
 
+# asennuksen metatietoa
+icing_utils.egg-info/
+
 # Conda-ympäristötiedostot
 *.conda
 *.env

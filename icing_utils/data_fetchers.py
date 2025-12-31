@@ -201,8 +201,13 @@ def fetch_icedata(
     endtime   = end_datetime.strftime("%Y%m%dT%H%M") """
 
     # FMI OpenData-server
-    url = 'http://opendata.fmi.fi/timeseries'
-    producer_string = "opendata"
+    # url = 'http://opendata.fmi.fi/timeseries'
+    # producer_string = "opendata"
+
+    # FMI OpenData-server
+    url = 'https://int.smartmet.fmi.fi/timeseries'
+    producer_string = "observations_fmi"
+    # print(url)
 
     # If there is more than one sensor in a site then the download string is a bit different compared to single sensor case.
     # MSOF frequensy main sensor oscillator.
@@ -249,7 +254,7 @@ def fetch_icedata(
         result = chardet.detect(raw_data)
         encoding = result['encoding']
         df = pd.read_csv(StringIO(raw_data.decode(encoding)))
-        print(df.head())
+        # print(df.head())
     else:
         print(f"Download failed with statuscode: {response.status_code}")
         return pd.DataFrame()
